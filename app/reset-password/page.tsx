@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -12,6 +13,7 @@ import { PasswordStrength } from "@/components/PasswordStrength";
 type Input = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordPage() {
+  const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const { register, handleSubmit, control, formState } = useForm<Input>({ resolver: zodResolver(resetPasswordSchema) });
@@ -23,6 +25,7 @@ export default function ResetPasswordPage() {
       setMessage("");
       const response = await api.post("/user/reset-password", { email: values.email, otp: values.otp, newPassword: values.password });
       setMessage(response.data?.message || "Password reset successfully.");
+      router.replace("/login");
     } catch (err: unknown) {
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
       setError(message || "Password reset failed.");
