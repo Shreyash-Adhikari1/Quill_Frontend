@@ -22,13 +22,11 @@ export const registerSchema = z.object({
   username: z.string().min(3, "Username is required").regex(/^[A-Za-z0-9_]+$/, "Username can only use letters, numbers, and underscores"),
   email: z.email("Enter a valid email"),
   password: passwordSchema,
-  captchaAnswer: z.string().min(1, "Solve the CAPTCHA"),
 });
 
 export const loginSchema = z.object({
   email: z.email("Enter a valid email"),
   password: z.string().min(1, "Password is required"),
-  captchaAnswer: z.string().min(1, "Solve the CAPTCHA"),
 });
 
 export const emailSchema = z.object({

@@ -41,12 +41,19 @@ RUN mkdir -p public
 # NEXT_PUBLIC variables are inlined into client-side Next.js bundles during build.
 ARG NEXT_PUBLIC_API_URL
 
+# Accept the public Google reCAPTCHA site key at build time for browser code.
+# This is safe to expose; the private verification secret stays backend-only.
+ARG NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+
 # NODE_ENV=production enables Next.js production optimizations.
 ENV NODE_ENV=production
 
 # Preserve the API URL for client code compiled by next build.
 # Without this, Axios could be bundled with an empty baseURL in Docker.
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Preserve the public reCAPTCHA key for the compiled login/register pages.
+ENV NEXT_PUBLIC_RECAPTCHA_SITE_KEY=$NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
 # Build the standalone Next.js server under .next/standalone.
 # next.config.ts enables output: "standalone" for this Docker shape.
