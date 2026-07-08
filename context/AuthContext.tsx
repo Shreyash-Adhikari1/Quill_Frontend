@@ -10,7 +10,7 @@ type LoginResult = { user: User | null; requiresOtp: boolean };
 type AuthContextValue = {
   user: User | null;
   isLoading: boolean;
-  login: (input: LoginInput & { captchaId?: string; captchaAnswer?: string }) => Promise<LoginResult>;
+  login: (input: LoginInput & { recaptchaToken: string }) => Promise<LoginResult>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<User | null>;
 };
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshUser]);
 
   const login = useCallback(
-    async (input: LoginInput & { captchaId?: string; captchaAnswer?: string }) => {
+    async (input: LoginInput & { recaptchaToken: string }) => {
       // Never store JWTs or auth state in localStorage/sessionStorage. The backend
       // sets the httpOnly auth cookie, and the context only mirrors /user/me.
       const response = await api.post("/user/login", input);
