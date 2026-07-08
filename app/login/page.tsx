@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,34 +9,29 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useAuth } from "@/context/AuthContext";
 import { loginSchema } from "@/lib/schemas";
+import { getRecaptchaToken, RecaptchaWidget, resetRecaptcha } from "@/components/RecaptchaWidget";
 
 type Input = z.infer<typeof loginSchema>;
-type Captcha = { captchaId: string; question: string };
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [error, setError] = useState("");
-  const [captcha, setCaptcha] = useState<Captcha | null>(null);
   const { register, handleSubmit, formState } = useForm<Input>({ resolver: zodResolver(loginSchema) });
-
-  async function refreshCaptcha() {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user/captcha`, { withCredentials: true });
-    setCaptcha(response.data);
-  }
-
-  useEffect(() => {
-    void refreshCaptcha();
-  }, []);
 
   async function onSubmit(values: Input) {
     // Client-side validation here is for UX ONLY; backend validation and cookie issuance are authoritative.
     try {
       setError("");
-      const result = await login({ ...values, captchaId: captcha?.captchaId });
+      const recaptchaToken = getRecaptchaToken();
+      if (!recaptchaToken) {
+        setError("Complete the reCAPTCHA challenge before logging in.");
+        return;
+      }
+      const result = await login({ ...values, recaptchaToken });
       router.push(result.requiresOtp ? "/verify-login-otp" : "/feed");
     } catch (err: unknown) {
-      void refreshCaptcha();
+      resetRecaptcha();
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
       setError(message || "Login failed. Confirm the backend is running over HTTPS.");
     }
@@ -48,11 +43,7 @@ export default function LoginPage() {
       <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
         <input className="field" placeholder="Email" type="email" {...register("email")} />
         <input className="field" placeholder="Password" type="password" {...register("password")} />
-        <label className="grid gap-2 text-sm text-muted">
-          {/* CAPTCHA slows automated credential stuffing in addition to backend rate limits and account lockout. */}
-          CAPTCHA: {captcha?.question || "Loading..."}
-          <input className="field" placeholder="Answer" inputMode="numeric" {...register("captchaAnswer")} />
-        </label>
+        <RecaptchaWidget action="LOGIN" />
         {Object.values(formState.errors).map((error) => <p key={error.message} className="text-sm text-red-700">{error.message}</p>)}
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
         <button className="btn btn-primary" disabled={formState.isSubmitting}>Log in</button>

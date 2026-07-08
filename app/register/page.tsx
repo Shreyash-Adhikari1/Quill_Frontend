@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,36 +10,31 @@ import { z } from "zod";
 import api from "@/lib/api";
 import { registerSchema } from "@/lib/schemas";
 import { PasswordStrength } from "@/components/PasswordStrength";
+import { getRecaptchaToken, RecaptchaWidget, resetRecaptcha } from "@/components/RecaptchaWidget";
 
 type Input = z.infer<typeof registerSchema>;
-type Captcha = { captchaId: string; question: string };
 
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState("");
-  const [captcha, setCaptcha] = useState<Captcha | null>(null);
   const { register, handleSubmit, control, formState } = useForm<Input>({ resolver: zodResolver(registerSchema) });
   const password = useWatch({ control, name: "password" });
-
-  async function refreshCaptcha() {
-    const response = await api.get("/user/captcha");
-    setCaptcha(response.data);
-  }
-
-  useEffect(() => {
-    void refreshCaptcha();
-  }, []);
 
   async function onSubmit(values: Input) {
     // Client-side validation here is for UX ONLY; backend Zod validation remains authoritative.
     try {
       setError("");
-      await api.post("/user/register", { ...values, captchaId: captcha?.captchaId });
+      const recaptchaToken = getRecaptchaToken();
+      if (!recaptchaToken) {
+        setError("Complete the reCAPTCHA challenge before registering.");
+        return;
+      }
+      await api.post("/user/register", { ...values, recaptchaToken });
       router.push(`/verify-otp?email=${encodeURIComponent(values.email)}`);
     } catch (err: unknown) {
-      void refreshCaptcha();
+      resetRecaptcha();
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      setError(message || "Registration failed. Use a unique username/email, a strong password, and the current CAPTCHA answer.");
+      setError(message || "Registration failed. Use a unique username/email, a strong password, and complete reCAPTCHA.");
     }
   }
 
@@ -52,11 +47,7 @@ export default function RegisterPage() {
         <input className="field" placeholder="Email" type="email" {...register("email")} />
         <input className="field" placeholder="Password" type="password" {...register("password")} />
         <PasswordStrength value={password || ""} />
-        <label className="grid gap-2 text-sm text-muted">
-          {/* CAPTCHA reduces automated fake-account creation before backend registration work runs. */}
-          CAPTCHA: {captcha?.question || "Loading..."}
-          <input className="field" placeholder="Answer" inputMode="numeric" {...register("captchaAnswer")} />
-        </label>
+        <RecaptchaWidget action="REGISTER" />
         {Object.values(formState.errors).map((error) => <p key={error.message} className="text-sm text-red-700">{error.message}</p>)}
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
         <button className="btn btn-primary" disabled={formState.isSubmitting}>Register</button>
