@@ -19,6 +19,7 @@ export default function EditProfilePage() {
   const [mfaQr, setMfaQr] = useState("");
   const [mfaKey, setMfaKey] = useState("");
   const [mfaOtp, setMfaOtp] = useState("");
+  const [mfaPassword, setMfaPassword] = useState("");
   const [message, setMessage] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const profileForm = useForm<ProfileInput>({
@@ -55,7 +56,7 @@ export default function EditProfilePage() {
 
   async function setupMfa() {
     // MFA setup returns a QR image for an authenticator app; the secret is confirmed before it becomes active.
-    const response = await api.post("/user/me/mfa/setup");
+    const response = await api.post("/user/me/mfa/setup", { currentPassword: mfaPassword });
     setMfaQr(response.data.qrCodeDataUrl);
     setMfaKey(response.data.manualEntryKey);
   }
@@ -64,15 +65,17 @@ export default function EditProfilePage() {
     await api.post("/user/me/mfa/confirm", { otp: mfaOtp });
     await refreshUser();
     setMfaOtp("");
+    setMfaPassword("");
     setMfaQr("");
     setMfaKey("");
     setMessage("Two-factor authentication enabled.");
   }
 
   async function disableMfa() {
-    await api.post("/user/me/mfa/disable", { otp: mfaOtp });
+    await api.post("/user/me/mfa/disable", { otp: mfaOtp, currentPassword: mfaPassword });
     await refreshUser();
     setMfaOtp("");
+    setMfaPassword("");
     setMessage("Two-factor authentication disabled.");
   }
 
@@ -123,11 +126,12 @@ export default function EditProfilePage() {
           <section className="mt-8 grid gap-4 border-t border-line pt-8">
             <h2 className="font-heading text-2xl">Two-factor authentication</h2>
             <p className="text-sm text-muted">Status: {user?.otpEnabled ? "Enabled" : "Disabled"}</p>
-            {!user?.otpEnabled ? <button className="btn btn-secondary w-fit" onClick={setupMfa}>Set up 2FA</button> : null}
+            <input className="field max-w-xs" placeholder="Current password" type="password" value={mfaPassword} onChange={(event) => setMfaPassword(event.target.value)} />
+            {!user?.otpEnabled ? <button className="btn btn-secondary w-fit" disabled={!mfaPassword} onClick={setupMfa}>Set up 2FA</button> : null}
             {mfaQr ? <img src={mfaQr} alt="Authenticator QR code" className="h-44 w-44 rounded-quill border border-line" /> : null}
             {mfaKey ? <p className="break-all text-sm text-muted">Manual key: {mfaKey}</p> : null}
             <input className="field max-w-xs" placeholder="6-digit authenticator code" maxLength={6} inputMode="numeric" value={mfaOtp} onChange={(event) => setMfaOtp(event.target.value.replace(/\D/g, ""))} />
-            {!user?.otpEnabled ? <button className="btn btn-primary w-fit" disabled={mfaOtp.length !== 6 || !mfaQr} onClick={confirmMfa}>Enable 2FA</button> : <button className="btn btn-secondary w-fit" disabled={mfaOtp.length !== 6} onClick={disableMfa}>Disable 2FA</button>}
+            {!user?.otpEnabled ? <button className="btn btn-primary w-fit" disabled={mfaOtp.length !== 6 || !mfaQr} onClick={confirmMfa}>Enable 2FA</button> : <button className="btn btn-secondary w-fit" disabled={mfaOtp.length !== 6 || !mfaPassword} onClick={disableMfa}>Disable 2FA</button>}
           </section>
           <section className="mt-8 grid gap-4 border-t border-line pt-8">
             <h2 className="font-heading text-2xl">Privacy data</h2>
