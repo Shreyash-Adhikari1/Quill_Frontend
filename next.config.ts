@@ -7,9 +7,16 @@ const nextConfig: NextConfig = {
   async headers() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://localhost:5000/api";
     const apiOrigin = new URL(apiUrl).origin;
+    const isDevelopment = process.env.NODE_ENV !== "production";
+    const scriptSrc = [
+      "script-src 'self' 'unsafe-inline'",
+      ...(isDevelopment ? ["'unsafe-eval'"] : []),
+      "https://www.google.com",
+      "https://www.gstatic.com",
+    ].join(" ");
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       `connect-src 'self' ${apiOrigin} https://www.google.com https://www.gstatic.com`,
