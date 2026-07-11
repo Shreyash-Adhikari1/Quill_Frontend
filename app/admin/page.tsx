@@ -46,12 +46,16 @@ export default function AdminPage() {
   }, [auditLogs, auditSearch]);
 
   async function deleteUser(user: User) {
-    await api.delete(`/admin/users/delete/${getId(user)}`);
+    await api.delete(`/admin/users/delete/${getId(user)}`, {
+      headers: { "X-Confirm-Action": "DELETE" },
+    });
     await load();
   }
 
   async function deletePost(post: Post) {
-    await api.delete(`/admin/posts/delete/${post._id || post.id}`);
+    await api.delete(`/admin/posts/delete/${post._id || post.id}`, {
+      headers: { "X-Confirm-Action": "DELETE" },
+    });
     await load();
   }
 

@@ -5,9 +5,6 @@ import Script from "next/script";
 declare global {
   interface Window {
     grecaptcha?: {
-      enterprise?: {
-        reset: () => void;
-      };
       reset?: () => void;
     };
   }
@@ -20,7 +17,6 @@ export function getRecaptchaToken() {
 
 export function resetRecaptcha() {
   // Resetting after failed auth forces a fresh single-use token instead of replaying an expired one.
-  window.grecaptcha?.enterprise?.reset?.();
   window.grecaptcha?.reset?.();
 }
 
@@ -33,7 +29,7 @@ export function RecaptchaWidget({ action }: { action: "LOGIN" | "REGISTER" }) {
 
   return (
     <div className="min-h-[78px]">
-      <Script src="https://www.google.com/recaptcha/enterprise.js" strategy="afterInteractive" />
+      <Script src="https://www.google.com/recaptcha/api.js" strategy="afterInteractive" />
       {/* Google renders the checkbox/challenge here and returns a token that the backend verifies with the secret key. */}
       <div className="g-recaptcha" data-sitekey={siteKey} data-action={action} />
     </div>
