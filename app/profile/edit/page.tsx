@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import axios from "axios";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import api from "@/lib/api";
@@ -21,6 +22,7 @@ export default function EditProfilePage() {
   const [mfaOtp, setMfaOtp] = useState("");
   const [mfaPassword, setMfaPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const profileForm = useForm<ProfileInput>({
     resolver: zodResolver(profileSchema),
@@ -34,17 +36,24 @@ export default function EditProfilePage() {
 
   async function saveProfile(values: ProfileInput) {
     // Client-side validation here is for UX ONLY; backend authorization and Zod validation remain authoritative.
-    const formData = new FormData();
-    formData.append("fullName", values.fullName);
-    formData.append("bio", values.bio || "");
-    if (avatarFile) {
-      // Avatar uploads go through multer's profile-image field so files are filtered and stored server-side.
-      formData.append("profile-image", avatarFile);
+    try {
+      setError("");
+      setMessage("");
+      const formData = new FormData();
+      formData.append("fullName", values.fullName);
+      formData.append("bio", values.bio || "");
+      if (avatarFile) {
+        // Avatar uploads go through multer's profile-image field so files are filtered and stored server-side.
+        formData.append("profile-image", avatarFile);
+      }
+      await api.patch("/user/me", formData);
+      await refreshUser();
+      setAvatarFile(null);
+      setMessage("Profile updated successfully.");
+    } catch (err: unknown) {
+      const responseMessage = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(responseMessage || "Profile update failed. Please try again.");
     }
-    await api.patch("/user/me", formData);
-    await refreshUser();
-    setAvatarFile(null);
-    setMessage("Profile updated successfully.");
   }
 
   async function changePassword(values: PasswordInput) {
@@ -141,6 +150,7 @@ export default function EditProfilePage() {
             </div>
           </section>
           {message ? <p className="mt-5 text-sm text-accent">{message}</p> : null}
+          {error ? <p className="mt-5 text-sm text-red-700">{error}</p> : null}
         </main>
       </Shell>
     </ProtectedRoute>

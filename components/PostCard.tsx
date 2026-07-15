@@ -18,6 +18,13 @@ export function PostCard({
 }) {
   const { user } = useAuth();
   const author = postAuthor(post);
+  const authorId = getId(author) || getId(post.userId);
+  const ownProfile = Boolean(authorId && authorId === getId(user));
+  const authorProfileHref = ownProfile
+    ? "/profile"
+    : author?.username
+      ? `/profile/${author.username}`
+      : "/profile";
   const postId = post._id || post.id || "";
   const [upvotes, setUpvotes] = useState(post.likeCount ?? 0);
   const [hasUpvoted, setHasUpvoted] = useState(Boolean(post.likedBy?.some((item) => getId(item) === getId(user))));
@@ -48,7 +55,7 @@ export function PostCard({
   return (
     <article className="border-b border-line py-6">
       <div className="mb-2 flex items-center justify-between gap-4 text-sm text-muted">
-        <Link className="flex items-center gap-2" href={author?.username ? `/profile/${author.username}` : "/profile"}>
+        <Link className="flex items-center gap-2" href={authorProfileHref}>
           {avatarOf(author) ? <img src={avatarOf(author)} alt="" className="h-7 w-7 rounded-quill object-cover" /> : <span className="h-7 w-7 rounded-quill bg-accent-soft" />}
           <span>
             {/* SECURITY NOTE: username is user-generated content rendered by JSX text interpolation.
