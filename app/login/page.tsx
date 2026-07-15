@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +18,15 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [error, setError] = useState("");
   const { register, handleSubmit, formState } = useForm<Input>({ resolver: zodResolver(loginSchema) });
+
+  useEffect(() => {
+    const oauthError = new URLSearchParams(window.location.search).get("oauth");
+    if (oauthError === "state") {
+      setError("Google sign-in expired or could not be verified. Please try again.");
+    } else if (oauthError === "failed") {
+      setError("Google sign-in failed. Please try again or use your email and password.");
+    }
+  }, []);
 
   async function onSubmit(values: Input) {
     // Client-side validation here is for UX ONLY; backend validation and cookie issuance are authoritative.

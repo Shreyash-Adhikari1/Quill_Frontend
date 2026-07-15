@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,8 +16,12 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const { register, handleSubmit, control, formState } = useForm<Input>({ resolver: zodResolver(resetPasswordSchema) });
+  const { register, handleSubmit, control, formState, setValue } = useForm<Input>({ resolver: zodResolver(resetPasswordSchema) });
   const password = useWatch({ control, name: "password" });
+  useEffect(() => {
+    const email = new URLSearchParams(window.location.search).get("email");
+    if (email) setValue("email", email);
+  }, [setValue]);
   async function onSubmit(values: Input) {
     // Client-side validation here is for UX ONLY; backend validates the OTP and new password policy.
     try {
@@ -27,7 +31,7 @@ export default function ResetPasswordPage() {
       setMessage(response.data?.message || "Password reset successfully.");
       router.replace("/login");
     } catch (err: unknown) {
-      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      const message = axios.isAxiosError(err) ? (err.response?.data?.message || err.response?.data?.error) : undefined;
       setError(message || "Password reset failed.");
     }
   }
