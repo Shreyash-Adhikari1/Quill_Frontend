@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,6 +12,7 @@ import { emailSchema } from "@/lib/schemas";
 type Input = z.infer<typeof emailSchema>;
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const { register, handleSubmit, formState } = useForm<Input>({ resolver: zodResolver(emailSchema) });
@@ -21,8 +23,9 @@ export default function ForgotPasswordPage() {
       setMessage("");
       const response = await api.post("/user/request-password-reset", values);
       setMessage(response.data?.message || "If the email is registered, a reset OTP has been sent.");
+      router.push(`/reset-password?email=${encodeURIComponent(values.email)}`);
     } catch (err: unknown) {
-      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      const message = axios.isAxiosError(err) ? (err.response?.data?.message || err.response?.data?.error) : undefined;
       setError(message || "Could not send reset OTP.");
     }
   }

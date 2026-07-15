@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import api from "@/lib/api";
 import { getId, listFrom, postTitle } from "@/lib/normalizers";
 import type { ActivityLog, Post, User } from "@/lib/types";
@@ -14,6 +15,8 @@ export default function AdminPage() {
   const [userSearch, setUserSearch] = useState("");
   const [postSearch, setPostSearch] = useState("");
   const [auditSearch, setAuditSearch] = useState("");
+  const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState("");
 
   async function load() {
     const [usersResponse, postsResponse, auditResponse] = await Promise.all([
@@ -46,17 +49,37 @@ export default function AdminPage() {
   }, [auditLogs, auditSearch]);
 
   async function deleteUser(user: User) {
-    await api.delete(`/admin/users/delete/${getId(user)}`, {
-      headers: { "X-Confirm-Action": "DELETE" },
-    });
-    await load();
+    const userId = getId(user);
+    try {
+      setError("");
+      setDeletingId(userId);
+      await api.delete(`/admin/users/delete/${userId}`, {
+        headers: { "X-Confirm-Action": "DELETE" },
+      });
+      await load();
+    } catch (err: unknown) {
+      const responseMessage = axios.isAxiosError(err) ? err.response?.data?.message || err.response?.data?.error : undefined;
+      setError(responseMessage || "Could not delete the user. Confirm the backend is reachable.");
+    } finally {
+      setDeletingId("");
+    }
   }
 
   async function deletePost(post: Post) {
-    await api.delete(`/admin/posts/delete/${post._id || post.id}`, {
-      headers: { "X-Confirm-Action": "DELETE" },
-    });
-    await load();
+    const postId = post._id || post.id || "";
+    try {
+      setError("");
+      setDeletingId(postId);
+      await api.delete(`/admin/posts/delete/${postId}`, {
+        headers: { "X-Confirm-Action": "DELETE" },
+      });
+      await load();
+    } catch (err: unknown) {
+      const responseMessage = axios.isAxiosError(err) ? err.response?.data?.message || err.response?.data?.error : undefined;
+      setError(responseMessage || "Could not delete the post. Confirm the backend is reachable.");
+    } finally {
+      setDeletingId("");
+    }
   }
 
   function exportAuditLogs() {
@@ -68,6 +91,7 @@ export default function AdminPage() {
       <Shell>
         <main className="mx-auto max-w-6xl px-6 py-10">
           <h1 className="font-heading text-4xl">Admin panel</h1>
+          {error ? <p className="mt-4 text-sm text-red-700">{error}</p> : null}
           <div className="mt-8 grid gap-10 lg:grid-cols-2">
             <section>
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -81,7 +105,7 @@ export default function AdminPage() {
                     <p className="text-sm text-muted">@{user.username} {user.email}</p>
                     <div className="mt-3 flex gap-2">
                       <a className="btn btn-secondary py-2 text-sm" href={`/profile/${user.username}`}>View</a>
-                      <button className="btn btn-danger py-2 text-sm" onClick={() => void deleteUser(user)}>Delete</button>
+                      <button className="btn btn-danger py-2 text-sm" disabled={deletingId === getId(user)} onClick={() => void deleteUser(user)}>Delete</button>
                     </div>
                   </article>
                 ))}
@@ -99,7 +123,7 @@ export default function AdminPage() {
                     <p className="text-sm text-muted">{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}</p>
                     <div className="mt-3 flex gap-2">
                       <a className="btn btn-secondary py-2 text-sm" href={`/post/${post._id || post.id}`}>View</a>
-                      <button className="btn btn-danger py-2 text-sm" onClick={() => void deletePost(post)}>Delete</button>
+                      <button className="btn btn-danger py-2 text-sm" disabled={deletingId === (post._id || post.id)} onClick={() => void deletePost(post)}>Delete</button>
                     </div>
                   </article>
                 ))}
