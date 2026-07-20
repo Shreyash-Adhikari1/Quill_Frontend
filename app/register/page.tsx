@@ -39,8 +39,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="mx-auto grid min-h-screen max-w-md content-center px-6 py-12">
-      <h1 className="font-heading text-4xl">Create your Quill account</h1>
+    <main className="auth-shell">
+      <h1 className="font-heading text-4xl font-semibold">Make room for your thoughts.</h1>
+      <p className="mt-2 leading-7 text-muted">A calm writing space, ready when you are.</p>
       <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
         <input className="field" placeholder="Full name" {...register("fullName")} />
         <input className="field" placeholder="Username" {...register("username")} />

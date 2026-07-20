@@ -47,8 +47,9 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto grid min-h-screen max-w-md content-center px-6 py-12">
-      <h1 className="font-heading text-4xl">Welcome back</h1>
+    <main className="auth-shell">
+      <h1 className="font-heading text-4xl font-semibold">Welcome back.</h1>
+      <p className="mt-2 leading-7 text-muted">Your quiet corner is right where you left it.</p>
       <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
         <input className="field" placeholder="Email" type="email" {...register("email")} />
         <input className="field" placeholder="Password" type="password" {...register("password")} />
@@ -62,7 +63,7 @@ export default function LoginPage() {
         href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
       >
         {/* OAuth must use full page navigation, not fetch/XHR, because Google consent redirects happen in the browser. */}
-        Sign in with Google
+        Continue with Google
       </a>
       <div className="mt-5 flex justify-between text-sm text-muted">
         <Link className="text-accent" href="/register">Create account</Link>
