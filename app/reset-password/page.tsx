@@ -36,8 +36,9 @@ export default function ResetPasswordPage() {
     }
   }
   return (
-    <main className="mx-auto grid min-h-screen max-w-md content-center px-6 py-12">
-      <h1 className="font-heading text-4xl">Choose a new password</h1>
+    <main className="auth-shell">
+      <h1 className="font-heading text-4xl font-semibold">Choose a fresh key.</h1>
+      <p className="mt-2 leading-7 text-muted">Make it memorable to you and difficult for everyone else.</p>
       <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
         <input className="field" placeholder="Email" type="email" {...register("email")} />
         <input className="field" placeholder="Reset OTP" maxLength={6} {...register("otp")} />

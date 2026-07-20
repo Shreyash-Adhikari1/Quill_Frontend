@@ -18,8 +18,8 @@ export default function VerifyLoginOtpPage() {
   }
 
   return (
-    <main className="mx-auto grid min-h-screen max-w-md content-center px-6 py-12">
-      <h1 className="font-heading text-4xl">Two-factor check</h1>
+    <main className="auth-shell">
+      <h1 className="font-heading text-4xl font-semibold">One last check.</h1>
       <p className="mt-3 text-muted">Enter your 6-digit login code.</p>
       <input className="field mt-6 text-center text-2xl tracking-[0.4em]" maxLength={6} inputMode="numeric" value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))} />
       <button className="btn btn-primary mt-4" disabled={otp.length !== 6} onClick={submit}>Continue</button>

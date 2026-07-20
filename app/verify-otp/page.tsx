@@ -51,8 +51,8 @@ function VerifyOtpForm() {
   }
 
   return (
-    <main className="mx-auto grid min-h-screen max-w-md content-center px-6 py-12">
-      <h1 className="font-heading text-4xl">Verify your email</h1>
+    <main className="auth-shell">
+      <h1 className="font-heading text-4xl font-semibold">Check your inbox.</h1>
       <p className="mt-3 text-muted">Enter the 6-digit code sent after registration.</p>
       <input className="field mt-6" placeholder="Email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
       <input className="field mt-4 text-center text-2xl tracking-[0.4em]" maxLength={6} inputMode="numeric" value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))} />

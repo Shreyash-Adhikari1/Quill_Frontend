@@ -112,9 +112,11 @@ export default function EditProfilePage() {
   return (
     <ProtectedRoute>
       <Shell>
-        <main className="mx-auto max-w-3xl px-6 py-10">
-          <h1 className="font-heading text-4xl">Edit profile</h1>
-          <form className="mt-8 grid gap-4 border-b border-line pb-8" onSubmit={profileForm.handleSubmit(saveProfile)}>
+        <main className="mx-auto max-w-3xl px-5 py-10 sm:px-6 sm:py-14">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-accent">Your space</p>
+          <h1 className="font-heading text-4xl font-semibold sm:text-5xl">Settings, gently organized.</h1>
+          <form className="surface-panel mt-8 grid gap-4 p-5 sm:p-8" onSubmit={profileForm.handleSubmit(saveProfile)}>
+            <h2 className="font-heading text-2xl font-semibold">Profile details</h2>
             <input className="field" placeholder="Full name" {...profileForm.register("fullName")} />
             <textarea className="field min-h-32" placeholder="Bio" {...profileForm.register("bio")} />
             <label className="grid gap-2 text-sm text-muted">
@@ -124,7 +126,7 @@ export default function EditProfilePage() {
             {Object.values(profileForm.formState.errors).map((error) => <p key={error.message} className="text-sm text-red-700">{error.message}</p>)}
             <button className="btn btn-primary w-fit" disabled={profileForm.formState.isSubmitting}>Save profile</button>
           </form>
-          <form className="mt-8 grid gap-4" onSubmit={passwordForm.handleSubmit(changePassword)}>
+          <form className="surface-panel mt-5 grid gap-4 p-5 sm:p-8" onSubmit={passwordForm.handleSubmit(changePassword)}>
             <h2 className="font-heading text-2xl">Change password</h2>
             <input className="field" placeholder="Current password" type="password" {...passwordForm.register("currentPassword")} />
             <input className="field" placeholder="New password" type="password" {...passwordForm.register("newPassword")} />
@@ -132,7 +134,7 @@ export default function EditProfilePage() {
             {Object.values(passwordForm.formState.errors).map((error) => <p key={error.message} className="text-sm text-red-700">{error.message}</p>)}
             <button className="btn btn-secondary w-fit" disabled={passwordForm.formState.isSubmitting}>Change password</button>
           </form>
-          <section className="mt-8 grid gap-4 border-t border-line pt-8">
+          <section className="surface-panel mt-5 grid gap-4 p-5 sm:p-8">
             <h2 className="font-heading text-2xl">Two-factor authentication</h2>
             <p className="text-sm text-muted">Status: {user?.otpEnabled ? "Enabled" : "Disabled"}</p>
             <input className="field max-w-xs" placeholder="Current password" type="password" value={mfaPassword} onChange={(event) => setMfaPassword(event.target.value)} />
@@ -142,7 +144,7 @@ export default function EditProfilePage() {
             <input className="field max-w-xs" placeholder="6-digit authenticator code" maxLength={6} inputMode="numeric" value={mfaOtp} onChange={(event) => setMfaOtp(event.target.value.replace(/\D/g, ""))} />
             {!user?.otpEnabled ? <button className="btn btn-primary w-fit" disabled={mfaOtp.length !== 6 || !mfaQr} onClick={confirmMfa}>Enable 2FA</button> : <button className="btn btn-secondary w-fit" disabled={mfaOtp.length !== 6 || !mfaPassword} onClick={disableMfa}>Disable 2FA</button>}
           </section>
-          <section className="mt-8 grid gap-4 border-t border-line pt-8">
+          <section className="surface-panel mt-5 grid gap-4 p-5 sm:p-8">
             <h2 className="font-heading text-2xl">Privacy data</h2>
             <div className="flex flex-wrap gap-3">
               <button className="btn btn-secondary" onClick={exportData}>Export my data</button>

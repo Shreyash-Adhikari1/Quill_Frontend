@@ -42,9 +42,10 @@ export function CommentThread({ postId }: { postId: string }) {
 
   return (
     <section className="mt-12 border-t border-line pt-8">
-      <h2 className="font-heading text-2xl">Comments</h2>
+      <h2 className="font-heading text-3xl font-semibold">The conversation</h2>
+      <p className="mt-1 text-sm text-muted">Add something kind, useful, or curious.</p>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-4 grid gap-3">
-        <textarea className="field min-h-28" placeholder="Add a thoughtful note" {...register("commentText")} />
+        <textarea className="field min-h-28" placeholder="Leave a thoughtful response..." {...register("commentText")} />
         {formState.errors.commentText ? <p className="text-sm text-red-700">{formState.errors.commentText.message}</p> : null}
         <button className="btn btn-primary w-fit" disabled={formState.isSubmitting}>Comment</button>
         {message ? <p className="text-sm text-accent">{message}</p> : null}
@@ -53,7 +54,7 @@ export function CommentThread({ postId }: { postId: string }) {
         {comments.map((comment) => {
           const author = commentAuthor(comment);
           return (
-            <article key={comment._id || comment.id} className="border-b border-line pb-5">
+            <article key={comment._id || comment.id} className="rounded-quill border border-line/80 bg-surface/60 p-5">
               <p className="text-sm text-muted">
                 {/* SECURITY NOTE: commenter username/fullName is user-generated content rendered as escaped JSX text. */}
                 {author?.username || author?.fullName || "writer"}

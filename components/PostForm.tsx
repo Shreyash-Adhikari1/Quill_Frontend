@@ -35,8 +35,9 @@ export function PostForm({ post }: { post?: Post }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5">
-      <input className="field text-xl" placeholder="Title" {...register("postTitle")} />
-      <textarea className="field min-h-80 leading-7" placeholder="Write your note..." {...register("postContent")} />
+      <input className="field border-0 bg-transparent px-1 font-heading text-3xl shadow-none placeholder:text-[#aaa095] focus:shadow-none" aria-label="Note title" placeholder="Give it a title…" {...register("postTitle")} />
+      <textarea className="field min-h-80 border-0 bg-transparent px-1 text-lg leading-8 shadow-none placeholder:text-[#aaa095] focus:shadow-none" aria-label="Note content" placeholder="Start writing here…" {...register("postContent")} />
+      <div className="h-px bg-line/80" />
       <label className="grid w-fit gap-2 text-sm text-muted">
         Visibility
         <select className="field w-auto py-2" {...register("visibility")}>

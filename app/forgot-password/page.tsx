@@ -30,8 +30,9 @@ export default function ForgotPasswordPage() {
     }
   }
   return (
-    <main className="mx-auto grid min-h-screen max-w-md content-center px-6 py-12">
-      <h1 className="font-heading text-4xl">Reset your password</h1>
+    <main className="auth-shell">
+      <h1 className="font-heading text-4xl font-semibold">Find your way back.</h1>
+      <p className="mt-2 leading-7 text-muted">We’ll send a short reset code to your inbox.</p>
       <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
         <input className="field" placeholder="Email" type="email" {...register("email")} />
         {formState.errors.email ? <p className="text-sm text-red-700">{formState.errors.email.message}</p> : null}

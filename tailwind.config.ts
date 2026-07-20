@@ -18,7 +18,7 @@ const config: Config = {
         body: ["var(--font-body)", "Arial", "sans-serif"],
       },
       borderRadius: {
-        quill: "6px",
+        quill: "16px",
       },
     },
   },
