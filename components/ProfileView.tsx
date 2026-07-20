@@ -38,13 +38,15 @@ export function ProfileView({ user, own = false }: { user: User; own?: boolean }
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-10">
-      <section className="border-b border-line pb-8">
+    <main className="mx-auto max-w-5xl px-5 py-10 sm:px-6 sm:py-14">
+      <section className="surface-panel relative overflow-hidden p-6 sm:p-9">
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-accent-soft/80 via-[#f4e9d7] to-[#e4e8dc]" />
+        <div className="relative pt-10">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex gap-4">
-            {avatarOf(user) ? <img src={avatarOf(user)} alt="" className="h-20 w-20 rounded-quill object-cover" /> : <div className="h-20 w-20 rounded-quill bg-accent-soft" />}
+            {avatarOf(user) ? <img src={avatarOf(user)} alt="" className="h-24 w-24 rounded-full border-4 border-surface object-cover shadow-md" /> : <div className="grid h-24 w-24 place-items-center rounded-full border-4 border-surface bg-accent text-3xl font-bold text-surface shadow-md">{(user.fullName || user.username || "Q").slice(0,1).toUpperCase()}</div>}
             <div>
-              <h1 className="font-heading text-4xl">
+              <h1 className="mt-3 font-heading text-4xl font-semibold">
                 {/* SECURITY NOTE: fullName is user-generated content rendered as escaped JSX text. */}
                 {user.fullName}
               </h1>
@@ -56,17 +58,19 @@ export function ProfileView({ user, own = false }: { user: User; own?: boolean }
           </div>
           {own ? <Link className="btn btn-secondary" href="/profile/edit">Edit profile</Link> : <button className="btn btn-primary" onClick={toggleFollow}>{following ? "Unfollow" : "Follow"}</button>}
         </div>
-        <p className="mt-6 max-w-2xl leading-7 text-muted">
+        <p className="mt-7 max-w-2xl leading-7 text-muted">
           {/* SECURITY NOTE: user bio is user-generated content rendered as escaped JSX text.
               NEVER use dangerouslySetInnerHTML for user bios. */}
           {user.bio || "No bio yet."}
         </p>
-        <div className="mt-5 flex gap-5 text-sm">
-          <button onClick={() => void openModal("followers")} className="text-accent">{user.followersCount ?? 0} followers</button>
-          <button onClick={() => void openModal("following")} className="text-accent">{user.followingCount ?? 0} following</button>
+        <div className="mt-6 flex gap-2 text-sm font-semibold">
+          <button onClick={() => void openModal("followers")} className="rounded-full bg-accent-soft px-4 py-2 text-accent">{user.followersCount ?? 0} followers</button>
+          <button onClick={() => void openModal("following")} className="rounded-full bg-[#e4e8dc] px-4 py-2 text-[#66705d]">{user.followingCount ?? 0} following</button>
+        </div>
         </div>
       </section>
-      <section className="py-6">
+      <div className="mb-5 mt-10 flex items-center justify-between"><h2 className="font-heading text-3xl font-semibold">Published notes</h2><span className="text-sm text-muted">{posts.length} total</span></div>
+      <section className="grid gap-4">
         {posts.map((post) => (
           <PostCard
             key={post._id || post.id}
