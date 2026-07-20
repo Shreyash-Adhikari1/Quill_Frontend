@@ -53,20 +53,20 @@ export function PostCard({
   }
 
   return (
-    <article className="border-b border-line py-6">
-      <div className="mb-2 flex items-center justify-between gap-4 text-sm text-muted">
-        <Link className="flex items-center gap-2" href={authorProfileHref}>
-          {avatarOf(author) ? <img src={avatarOf(author)} alt="" className="h-7 w-7 rounded-quill object-cover" /> : <span className="h-7 w-7 rounded-quill bg-accent-soft" />}
-          <span>
+    <article className="group relative rounded-[24px] border border-line/80 bg-surface/70 p-5 shadow-[0_1px_2px_rgba(63,51,39,.04)] transition duration-300 hover:-translate-y-0.5 hover:border-[#cdbdaf] hover:bg-surface hover:shadow-[0_18px_45px_rgba(72,57,42,.08)] sm:p-7">
+      <div className="mb-4 flex items-center justify-between gap-4 text-sm text-muted">
+        <Link className="flex items-center gap-3 font-medium transition hover:text-accent" href={authorProfileHref}>
+          {avatarOf(author) ? <img src={avatarOf(author)} alt="" className="h-9 w-9 rounded-full object-cover ring-2 ring-surface" /> : <span className="grid h-9 w-9 place-items-center rounded-full bg-accent-soft font-heading font-bold text-accent">{(author?.username || "W").slice(0, 1).toUpperCase()}</span>}
+          <span className="text-ink">
             {/* SECURITY NOTE: username is user-generated content rendered by JSX text interpolation.
                 React escapes it as text. NEVER use dangerouslySetInnerHTML for user content. */}
             {author?.username || "unknown writer"}
           </span>
         </Link>
-        <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}</span>
+        <span className="text-xs">{post.createdAt ? new Date(post.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : ""}</span>
       </div>
       <Link href={`/post/${postId}`}>
-        <h2 className="font-heading text-2xl text-ink">
+        <h2 className="font-heading text-[1.65rem] font-semibold leading-tight text-ink transition group-hover:text-accent">
           {/* SECURITY NOTE: post titles are user-generated content rendered as escaped JSX text. */}
           {postTitle(post)}
         </h2>
@@ -75,27 +75,27 @@ export function PostCard({
           {postContent(post)}
         </p>
       </Link>
-      <div className="mt-5 flex items-center gap-3">
+      <div className="mt-6 flex items-center gap-2 border-t border-line/70 pt-4">
         <button
-          className={`grid h-10 w-10 place-items-center rounded-quill border text-xl transition ${hasUpvoted ? "border-rose-400 bg-rose-100 text-rose-700" : "border-line text-muted hover:border-rose-300 hover:text-rose-700"} disabled:opacity-70`}
+          className={`grid h-9 w-9 place-items-center rounded-full border text-lg transition ${hasUpvoted ? "border-[#d69b86] bg-accent-soft text-accent" : "border-line text-muted hover:border-[#d69b86] hover:bg-accent-soft hover:text-accent"} disabled:opacity-70`}
           aria-label="Upvote post"
           disabled={isVoting || hasUpvoted}
           onClick={() => void vote("up")}
         >
-          ^
+          &uarr;
         </button>
         <button
-          className={`grid h-10 w-10 place-items-center rounded-quill border text-xl transition ${downvotedFlash ? "border-sky-300 bg-sky-100 text-sky-700" : "border-line text-muted hover:border-sky-300 hover:text-sky-700"} disabled:opacity-70`}
+          className={`grid h-9 w-9 place-items-center rounded-full border text-lg transition ${downvotedFlash ? "border-[#aeb99f] bg-[#e4e8dc] text-[#66705d]" : "border-line text-muted hover:border-[#aeb99f] hover:bg-[#e4e8dc] hover:text-[#66705d]"} disabled:opacity-70`}
           aria-label="Downvote post"
           disabled={isVoting || !hasUpvoted}
           onClick={() => void vote("down")}
         >
-          v
+          &darr;
         </button>
+        <p className="ml-1 text-sm font-medium text-muted">{upvotes} {upvotes === 1 ? "appreciation" : "appreciations"}</p>
       </div>
-      <p className="mt-2 text-sm text-muted">{upvotes} upvotes</p>
       {showActions ? (
-        <div className="mt-4 flex gap-3 text-sm">
+        <div className="mt-4 flex gap-4 text-sm font-semibold">
           <Link className="text-accent" href={`/post/${postId}/edit`}>Edit</Link>
           <button className="text-red-700" onClick={() => void deletePost()}>Delete</button>
         </div>
